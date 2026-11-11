@@ -28,7 +28,6 @@ st.markdown(
     div[data-testid="stPlotlyChart"] {
         border-radius: 16px !important;
         overflow: hidden !important;
-        border: 1px solid #7E829B !important;
     }
     div[data-testid="stPlotlyChart"] > div {
         border-radius: 16px !important;
@@ -54,21 +53,35 @@ st.markdown(
 # ==========================================
 # 1. SIDEBAR CONFIGURATION
 # ==========================================
+# ==========================================
+# 1. SIDEBAR CONFIGURATION
+# ==========================================
 with st.sidebar:
     st.header("Trajectory Settings")
     shooter_type = st.radio(
-        "Shooter Mechanism Type",
-        options=["Single Flywheel", "Dual flywheel"],
-        index=0
+    "Shooter Mechanism Type",
+    options=["Single Flywheel", "Dual flywheel"],
+    index=0
     )
+
     efficiency_loss = st.slider('Efficiency Loss [%]', 0.0, 50.0, 10.0, 0.5)
     angle = st.slider('Angle [deg]', 1.0, 90.0, 45.0, 0.5) 
-    height_mm = st.slider('Height [mm]', 0.0, 2000.0, 365.0, 5.0) 
     wheel_Radius_inch = st.slider('Wheel Radius [inch]', 0.5, 6.0, 3.0, 0.1) 
     velocity_RPM = st.slider('Speed [RPM]', 500, 8000, 3000, 25)
 
+    st.header("Launch Position Settings")
+    robot_x_mm = st.number_input('Robot Position X [mm]', 0.0, 3600.0, 0.0, 1.0)
+    height_mm = st.number_input('Launch height Y [mm]', 0.0, 2000.0, 365.0, 5.0)
+
     st.header("Aerodynamics & Environment")
     use_drag = st.checkbox("Enable Air Resistance (Drag)", value=True)
+    use_magnus = st.checkbox("Enable Spin Effect (Magnus)", value=True)
+
+    spin_type = st.selectbox(
+        "Spin Direction",
+        options=["Backspin", "Topspin"],
+        disabled=not use_magnus
+    )
 
     # Gamepiece Preset Selector
     gamepiece = st.radio(
@@ -116,6 +129,7 @@ with st.sidebar:
 # ==========================================
 # 2. PHYSICS CALCULATIONS
 # ==========================================
+robot_x_m = float(robot_x_mm) / 1000.0
 target_start_x = target_start_x_mm / 1000.0
 target_start_y = target_start_y_mm / 1000.0
 target_end_x = target_end_x_mm / 1000.0
@@ -125,14 +139,21 @@ height_m = height_mm / 1000.0
 wheel_Radius_meter = wheel_Radius_inch * 0.0254
 wheel_surface_speed = velocity_RPM * (2 * np.pi / 60) * wheel_Radius_meter
 
-# Conversions for drag physics
+# Conversions for drag & spin physics
 ball_mass_kg = float(ball_mass_g) / 1000.0 
 ball_radius_m = (ball_diameter_inch * 0.0254) / 2.0 
 
+# Base speed & Spin RPM determination
+spin_efficiency = 0.70  
+
 if shooter_type == "Single Flywheel":
     base_velocity_ms = wheel_surface_speed * 0.5
+    raw_spin = velocity_RPM * (wheel_Radius_inch / ball_diameter_inch) * spin_efficiency
+    spin_direction_multiplier = 1.0 if spin_type == "Backspin" else -1.0
+    spin_rpm = raw_spin * spin_direction_multiplier
 else:
     base_velocity_ms = wheel_surface_speed
+    spin_rpm = 0.0
 
 efficiency_multiplier = (100.0 - efficiency_loss) / 100.0
 velocity_ms = base_velocity_ms * efficiency_multiplier
@@ -144,7 +165,7 @@ def check_line_intersection(p1, p2, q1, q2):
 
     denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
     if abs(denom) < 1e-9:
-        return False, None  # Lines are parallel
+        return False, None
 
     t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom
     u = ((x1 - x3) * (y1 - y2) - (y1 - y3) * (x1 - x2)) / denom
@@ -156,25 +177,43 @@ def check_line_intersection(p1, p2, q1, q2):
 
     return False, None
 
-def compute_trajectory(u, angle_deg, h0, g=9.81, drag=True):
+def compute_trajectory(u, angle_deg, h0, start_x=0.0, g=9.81, drag=True, magnus=True, spin_rpm=0.0):
     theta = np.radians(angle_deg)
     vx, vy = u * np.cos(theta), u * np.sin(theta)
 
     cd, rho = 0.47, 1.225 
     area = np.pi * (ball_radius_m**2)
-    k = (0.5 * rho * cd * area / ball_mass_kg) if drag else 0.0
+    k_drag = (0.5 * rho * cd * area / ball_mass_kg) if drag else 0.0
+
+    omega = spin_rpm * (2 * np.pi / 60.0)
 
     dt = 0.002
-    x_arr, y_arr = [0.0], [h0]
-    x, y = 0.0, h0
+    x_arr, y_arr = [start_x], [h0]
+    x, y = start_x, h0
     hit_target, impact_point = False, None
     goal_p1, goal_p2 = (target_start_x, target_start_y), (target_end_x, target_end_y)
 
     while y >= 0 and len(x_arr) < 3000:
         v = np.hypot(vx, vy)
-        ax = -k * v * vx
-        ay = -g - (k * v * vy)
-        
+        if v < 1e-4:
+            break
+
+        ax_drag = -k_drag * v * vx
+        ay_drag = -k_drag * v * vy
+
+        ax_mag, ay_mag = 0.0, 0.0
+        if magnus and abs(omega) > 1e-3:
+            spin_ratio = (abs(omega) * ball_radius_m) / v
+            cl = min(0.5, spin_ratio)
+            k_magnus = 0.5 * rho * cl * area / ball_mass_kg
+            spin_sign = np.sign(omega)
+            
+            ax_mag = -k_magnus * v * vy * spin_sign
+            ay_mag = k_magnus * v * vx * spin_sign
+
+        ax = ax_drag + ax_mag
+        ay = -g + ay_drag + ay_mag
+
         vx += ax * dt
         vy += ay * dt
         next_x, next_y = x + vx * dt, y + vy * dt
@@ -197,11 +236,10 @@ def compute_trajectory(u, angle_deg, h0, g=9.81, drag=True):
 # ==========================================
 st.subheader("Shot Calculator Trajectory")
 
-# Create figure FIRST before calling st.plotly_chart
 fig_traj = go.Figure()
 
 active_x, active_y, hit_target, impact_point = compute_trajectory(
-    velocity_ms, angle, height_m, gravity, use_drag
+    velocity_ms, angle, height_m, robot_x_m, gravity, use_drag, use_magnus, spin_rpm
 )
 
 if len(active_x) > 0:
@@ -236,11 +274,11 @@ fig_traj.add_trace(go.Scatter(
 
 # Launcher Node
 fig_traj.add_trace(go.Scatter(
-    x=[0], y=[height_m],
+    x=[robot_x_m], y=[height_m],
     mode='markers',
     name='Launcher',
     marker=dict(size=10, color='#377DFF', symbol='circle-open', line=dict(width=3)),
-    hovertemplate="Launcher Height: %{y:.2f} m<extra></extra>"
+    hovertemplate="Launcher Location: (%{x:.2f} m, %{y:.2f} m)<extra></extra>"
 ))
 
 fig_traj.update_layout(
