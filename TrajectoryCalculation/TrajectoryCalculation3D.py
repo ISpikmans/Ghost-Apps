@@ -125,25 +125,26 @@ st.markdown(
 # Origin (0.0, 0.0) = Exact Center of Field
 # ==========================================
 INCH_TO_M = 0.0254
-FIELD_LEN = 144.0 * INCH_TO_M        # 3.6576 m (12 ft)
-FIELD_HALF = 72.0 * INCH_TO_M        # 1.8288 m (6 ft)
-WALL_H = 12.0 * INCH_TO_M            # 0.3048 m (12 in)
-TILE_STEP = 24.0 * INCH_TO_M         # 0.6096 m (24 in)
+FIELD_LEN = 144.0 * INCH_TO_M             # 3.6576 m (12 ft)
+FIELD_HALF = 72.0 * INCH_TO_M             # 1.8288 m (6 ft)
+FIELD_HALF_MM = round(FIELD_HALF * 1000.0, 1)  # 1828.8 mm
+WALL_H = 12.0 * INCH_TO_M                 # 0.3048 m (12 in)
+TILE_STEP = 24.0 * INCH_TO_M              # 0.6096 m (24 in)
 
 # Center HIVE Structure — Turned 90 deg so the PENTAGONAL HOUSE OPENING faces outward (+/-X)!
-HIVE_FRAME_X = 38.95 * INCH_TO_M     # 0.9893 m base frame width along X
-HIVE_FRAME_Y = 49.46 * INCH_TO_M     # 1.2563 m base frame length along Y
-HIVE_PIVOT_Y = 12.75 * INCH_TO_M     # +/- 0.3239 m lateral offset of Red & Blue seesaws
-HIVE_AXLE_Z = 46.50 * INCH_TO_M      # 1.1811 m central A-frame pivot axle height
-HIVE_TILT_RAD = math.radians(30.0)   # 30.0 deg seesaw beam tilt angle
+HIVE_FRAME_X = 38.95 * INCH_TO_M          # 0.9893 m base frame width along X
+HIVE_FRAME_Y = 49.46 * INCH_TO_M          # 1.2563 m base frame length along Y
+HIVE_PIVOT_Y = 12.75 * INCH_TO_M          # +/- 0.3239 m lateral offset of Red & Blue seesaws
+HIVE_AXLE_Z = 46.50 * INCH_TO_M           # 1.1811 m central A-frame pivot axle height
+HIVE_TILT_RAD = math.radians(30.0)        # 30.0 deg seesaw beam tilt angle
 
-HIVE_OUTER_W = 24.60 * INCH_TO_M     # 0.6248 m outer width along Y
-HIVE_INNER_W = 21.25 * INCH_TO_M     # 0.5398 m inner clear width along Y
+HIVE_OUTER_W = 24.60 * INCH_TO_M          # 0.6248 m outer width along Y
+HIVE_INNER_W = 21.25 * INCH_TO_M          # 0.5398 m inner clear width along Y
 
-HIVE_U_IN = 4.5 * INCH_TO_M          # 0.1143 m inner back wall along seesaw beam
-HIVE_U_OUT = 25.5 * INCH_TO_M        # 0.6477 m outer pentagonal opening along seesaw beam
-HIVE_W_EAVE = 14.0 * INCH_TO_M       # 0.3556 m eave height above beam
-HIVE_W_TOP = 22.0 * INCH_TO_M        # 0.5588 m roof peak height above beam
+HIVE_U_IN = 4.5 * INCH_TO_M               # 0.1143 m inner back wall along seesaw beam
+HIVE_U_OUT = 25.5 * INCH_TO_M             # 0.6477 m outer pentagonal opening along seesaw beam
+HIVE_W_EAVE = 14.0 * INCH_TO_M            # 0.3556 m eave height above beam
+HIVE_W_TOP = 22.0 * INCH_TO_M             # 0.5588 m roof peak height above beam
 
 # Exact Raised ("Up") Pentagonal Entrance Plane Coordinates derived from HIVE_U_OUT & HIVE_TILT_RAD
 HIVE_OPEN_LOW_X = HIVE_U_OUT * math.cos(HIVE_TILT_RAD)
@@ -152,14 +153,18 @@ HIVE_OPEN_HIGH_X = HIVE_U_OUT * math.cos(HIVE_TILT_RAD) - HIVE_W_TOP * math.sin(
 HIVE_OPEN_HIGH_Z = HIVE_AXLE_Z + HIVE_U_OUT * math.sin(HIVE_TILT_RAD) + HIVE_W_TOP * math.cos(HIVE_TILT_RAD)
 
 # Perimeter FLOWERS (Manual Section 11.4.3 - Tile seams W6, F4, Y1, A2)
-FLOWER_Z = 32.5 * INCH_TO_M          # 0.8255 m
-FLOWER_OUTER_R = (11.1 * INCH_TO_M) / 2.0
+# Open-top horizontal hoop (11.1" OD, 9.5" ID, 2.5" rim depth) on a slim perimeter support post at 32.5" rim height
+FLOWER_Z = 32.5 * INCH_TO_M               # 0.8255 m top rim height
+FLOWER_OUTER_R = (11.1 * INCH_TO_M) / 2.0 # 0.1410 m outer radius
+FLOWER_INNER_R = (9.5 * INCH_TO_M) / 2.0  # 0.1207 m inner clear opening radius
+FLOWER_HOOP_H = 2.5 * INCH_TO_M           # 0.0635 m shallow open hoop collar depth
+FLOWER_POST_R = 0.75 * INCH_TO_M          # 0.0191 m slim vertical support post radius
 
-# LOADING ZONES (23" x 11") & GARDENS (23" x 2") (Manual Section 11.3.1 - 11.3.2)
-LZ_DEPTH = 11.0 * INCH_TO_M          # 0.2794 m
-LZ_WIDTH = 23.0 * INCH_TO_M          # 0.5842 m
-GARDEN_DEPTH = 2.0 * INCH_TO_M       # 0.0508 m
-GARDEN_WIDTH = 23.0 * INCH_TO_M      # 0.5842 m
+# LOADING / PARKING ZONES (23" x 11") & GARDENS (23" x 2") (Mirrored across X = 0 while keeping same Y sides)
+LZ_DEPTH = 11.0 * INCH_TO_M               # 0.2794 m
+LZ_WIDTH = 23.0 * INCH_TO_M               # 0.5842 m
+GARDEN_DEPTH = 2.0 * INCH_TO_M            # 0.0508 m
+GARDEN_WIDTH = 23.0 * INCH_TO_M           # 0.5842 m
 
 # ==========================================
 # 1. SIDEBAR CONFIGURATION
@@ -215,52 +220,70 @@ with st.sidebar:
             )
             show_biobuzz_elements = False
 
-        # Gamepiece Selector (Pollen or Nectar only)
-        gamepiece = st.radio(
-            "Gamepiece",
-            options=["Pollen", "Nectar"],
-            index=0,
-            horizontal=True
-        )
+        if show_biobuzz_elements:
+            # Gamepiece Selector (Pollen or Nectar — BIOBUZZ season specific)
+            gamepiece = st.radio(
+                "Gamepiece",
+                options=["Pollen", "Nectar"],
+                index=0,
+                horizontal=True
+            )
 
-        if gamepiece == "Pollen":
-            ball_diameter_inch, ball_mass_g = 2.8, 25
+            if gamepiece == "Pollen":
+                ball_diameter_inch, ball_mass_g = 2.8, 25
+            else:
+                ball_diameter_inch, ball_mass_g = 3.6, 41
+
+            st.caption(f'Diameter: {ball_diameter_inch}" | Mass: {ball_mass_g} g')
+
+            st.header("Target HIVE Seesaw")
+            target_alliance = st.radio(
+                "Alliance HIVE Seesaw",
+                options=["Red HIVE (Y = -0.32m)", "Blue HIVE (Y = +0.32m)"],
+                index=0,
+                horizontal=True
+            )
+            raised_side = st.radio(
+                "Raised ('Up') Cell Side",
+                options=["Left (-X) Up", "Right (+X) Up"],
+                index=0,
+                horizontal=True
+            )
+
+            is_red_hive = "Red" in target_alliance
+            is_left_up = "Left" in raised_side
+            side_sign_x = -1.0 if is_left_up else 1.0
+            side_sign_y = -1.0 if is_red_hive else 1.0
+
+            def_gx1 = round(side_sign_x * HIVE_OPEN_LOW_X * 1000)
+            def_gz1 = round(HIVE_OPEN_LOW_Z * 1000)
+            def_gx2 = round(side_sign_x * HIVE_OPEN_HIGH_X * 1000)
+            def_gz2 = round(HIVE_OPEN_HIGH_Z * 1000)
+            def_gy = round(side_sign_y * HIVE_PIVOT_Y * 1000)
+            def_gw = round(HIVE_INNER_W * 1000)
+
+            target_start_x_mm, target_start_z_mm = def_gx1, def_gz1
+            target_end_x_mm, target_end_z_mm = def_gx2, def_gz2
+            target_center_y_mm = def_gy
+            target_width_mm = def_gw
         else:
-            ball_diameter_inch, ball_mass_g = 3.6, 41
+            # No BIOBUZZ gamepieces (Pollen/Nectar) when FTC -> None or FRC is selected
+            st.caption("No game-specific pieces active for this selection.")
+            ball_diameter_inch = st.number_input('Custom Ball Diameter [inch]', 1.0, 15.0, 5.0, 0.25)
+            ball_mass_g = st.number_input('Custom Ball Mass [g]', 10.0, 1000.0, 150.0, 5.0)
 
-        st.caption(f'Diameter: {ball_diameter_inch}" | Mass: {ball_mass_g} g')
+            is_red_hive = True
+            is_left_up = True
+            side_sign_x = -1.0
+            raised_side = "Custom Target"
 
-        st.header("Target HIVE Seesaw")
-        target_alliance = st.radio(
-            "Alliance HIVE Seesaw",
-            options=["Red HIVE (Y = -0.32m)", "Blue HIVE (Y = +0.32m)"],
-            index=0,
-            horizontal=True
-        )
-        raised_side = st.radio(
-            "Raised ('Up') Cell Side",
-            options=["Left (-X) Up", "Right (+X) Up"],
-            index=0,
-            horizontal=True
-        )
-
-        is_red_hive = "Red" in target_alliance
-        is_left_up = "Left" in raised_side
-        side_sign_x = -1.0 if is_left_up else 1.0
-        side_sign_y = -1.0 if is_red_hive else 1.0
-
-        def_gx1 = round(side_sign_x * HIVE_OPEN_LOW_X * 1000)
-        def_gz1 = round(HIVE_OPEN_LOW_Z * 1000)
-        def_gx2 = round(side_sign_x * HIVE_OPEN_HIGH_X * 1000)
-        def_gz2 = round(HIVE_OPEN_HIGH_Z * 1000)
-        def_gy = round(side_sign_y * HIVE_PIVOT_Y * 1000)
-        def_gw = round(HIVE_INNER_W * 1000)
-
-        target_start_x_mm, target_start_z_mm = def_gx1, def_gz1
-        target_end_x_mm, target_end_z_mm = def_gx2, def_gz2
-
-        target_center_y_mm = def_gy
-        target_width_mm = def_gw
+            st.header("Custom Target Opening")
+            target_start_x_mm = st.number_input('Target Bottom X [mm]', -5000.0, 5000.0, 0.0, 10.0)
+            target_start_z_mm = st.number_input('Target Bottom Z [mm]', 100.0, 4000.0, 1200.0, 10.0)
+            target_end_x_mm = st.number_input('Target Top X [mm]', -5000.0, 5000.0, 0.0, 10.0)
+            target_end_z_mm = st.number_input('Target Top Z [mm]', 200.0, 4500.0, 1800.0, 10.0)
+            target_center_y_mm = st.number_input('Target Center Y [mm]', -4000.0, 4000.0, 0.0, 10.0, disabled=not is_3d)
+            target_width_mm = st.number_input('Target Width Y [mm]', 100.0, 3000.0, 600.0, 10.0, disabled=not is_3d)
 
     with st.expander("Launch Parameters", expanded=False):
         shooter_type = st.radio("Shooter Mechanism Type", options=["Single Flywheel", "Dual flywheel"], index=0)
@@ -268,15 +291,43 @@ with st.sidebar:
         pitch_deg = st.slider('Pitch Angle [deg]', 1.0, 90.0, 62.0, 0.5)
         wheel_Radius_inch = st.slider('Wheel Radius [inch]', 0.5, 6.0, 3.0, 0.1)
 
-    with st.expander("Robot Location", expanded=False):
-        st.header("Launch Position (Center = 0,0)")
-        st.caption("Tip: Hold **Shift + Drag** in the plot to move the Launcher.")
-        robot_x_mm = st.number_input('Robot X [mm]', -1829.0, 1829.0, -1200.0, 10.0)
-        robot_y_mm = st.number_input(
-            'Robot Lateral Y [mm]', -1829.0, 1829.0, -324.0, 10.0,
+    with st.expander("Robot Dimensions & Shooter", expanded=False):
+        robot_length_mm = st.number_input('Robot Length (Front–Back) [mm]', 100.0, 1500.0, 457.0, 5.0)
+        robot_width_mm = st.number_input('Robot Width (Left–Right) [mm]', 100.0, 1500.0, 457.0, 5.0)
+        height_mm = st.number_input('Launch Height Z [mm]', 0.0, 2000.0, 365.0, 5.0)
+
+        half_len_mm = robot_length_mm / 2.0
+        half_wid_mm = robot_width_mm / 2.0
+        shooter_off_x_mm = st.number_input(
+            'Shooter Offset X on Robot [mm]',
+            -half_len_mm, half_len_mm, 0.0, 5.0
+        )
+        shooter_off_y_mm = st.number_input(
+            'Shooter Offset Y on Robot [mm]',
+            -half_wid_mm, half_wid_mm, 0.0, 5.0,
             disabled=not is_3d
         )
-        height_mm = st.number_input('Launch Height Z [mm]', 0.0, 2000.0, 365.0, 5.0)
+
+    # Enforce strict field perimeter containment for the entire robot footprint
+    max_center_x_mm = max(0.0, FIELD_HALF_MM - half_len_mm)
+    max_center_y_mm = max(0.0, FIELD_HALF_MM - half_wid_mm)
+
+    with st.expander("Robot Location", expanded=False):
+        st.header("Robot Center (Field Center = 0,0)")
+        st.caption("Tip: Hold **Shift + Drag** in the plot to move the Robot.")
+        robot_x_mm = st.number_input(
+            'Robot X [mm]',
+            -max_center_x_mm, max_center_x_mm,
+            max(-max_center_x_mm, min(max_center_x_mm, -1200.0)),
+            10.0
+        )
+        robot_y_mm = st.number_input(
+            'Robot Lateral Y [mm]',
+            -max_center_y_mm, max_center_y_mm,
+            max(-max_center_y_mm, min(max_center_y_mm, -324.0)),
+            10.0,
+            disabled=not is_3d
+        )
 
     with st.expander("Aerodynamics & Spin", expanded=False):
         use_drag = st.checkbox("Enable Air Resistance (Drag)", value=True)
@@ -293,12 +344,27 @@ with st.sidebar:
 # 2. UNIFIED 2D / 3D PHYSICS CALCULATIONS
 # ==========================================
 active_robot_y_mm = robot_y_mm if is_3d else 0.0
+active_shooter_off_y_mm = shooter_off_y_mm if is_3d else 0.0
 active_sidespin_deg = sidespin_deg if is_3d else 0.0
 active_goal_center_y_mm = target_center_y_mm if is_3d else 0.0
 
-robot_x_m = float(robot_x_mm) / 1000.0
-robot_y_m = float(active_robot_y_mm) / 1000.0
+robot_length_m = float(robot_length_mm) / 1000.0
+robot_width_m = float(robot_width_mm) / 1000.0
+half_robot_len_m = robot_length_m / 2.0
+half_robot_wid_m = robot_width_m / 2.0
+
+# Clamp robot center to field walls accounting for full robot dimensions
+min_robot_x_m = -FIELD_HALF + half_robot_len_m
+max_robot_x_m = FIELD_HALF - half_robot_len_m
+min_robot_y_m = -FIELD_HALF + half_robot_wid_m
+max_robot_y_m = FIELD_HALF - half_robot_wid_m
+
+robot_x_m = max(min_robot_x_m, min(max_robot_x_m, float(robot_x_mm) / 1000.0))
+robot_y_m = max(min_robot_y_m, min(max_robot_y_m, float(active_robot_y_mm) / 1000.0))
 height_m = float(height_mm) / 1000.0
+
+shooter_off_x_m = float(shooter_off_x_mm) / 1000.0
+shooter_off_y_m = float(active_shooter_off_y_mm) / 1000.0
 
 goal_x1 = target_start_x_mm / 1000.0
 goal_z1 = target_start_z_mm / 1000.0
@@ -309,15 +375,20 @@ goal_half_w = (target_width_mm / 1000.0) / 2.0
 goal_y_min = goal_y_center - goal_half_w
 goal_y_max = goal_y_center + goal_half_w
 
-# Automatic Turret Yaw pointing directly at the center of the active raised HIVE entrance
+# World position of the shooter mounted on the robot chassis
 goal_x_center = (goal_x1 + goal_x2) / 2.0
-dx_goal = goal_x_center - robot_x_m
-dy_goal = goal_y_center - robot_y_m
-
 if is_3d:
+    launcher_x_m = robot_x_m + shooter_off_x_m
+    launcher_y_m = robot_y_m + shooter_off_y_m
+    dx_goal = goal_x_center - launcher_x_m
+    dy_goal = goal_y_center - launcher_y_m
     active_yaw_deg = math.degrees(math.atan2(dy_goal, dx_goal))
 else:
-    active_yaw_deg = 0.0 if dx_goal >= 0 else 180.0
+    facing_2d = 1.0 if (goal_x_center - robot_x_m) >= 0.0 else -1.0
+    launcher_x_m = robot_x_m + facing_2d * shooter_off_x_m
+    launcher_y_m = 0.0
+    dx_goal = goal_x_center - launcher_x_m
+    active_yaw_deg = 0.0 if dx_goal >= 0.0 else 180.0
 
 wheel_Radius_meter = wheel_Radius_inch * 0.0254
 ball_mass_kg = float(ball_mass_g) / 1000.0
@@ -346,7 +417,7 @@ def get_launch_params(rpm):
 
 def check_goal_intersection(p1, p2):
     """Checks if the ball (with physical radius ball_radius_m) passes cleanly through the
-    pentagonal house entrance without hitting the bottom lip, side walls, or pitched roof."""
+    target entrance without hitting the bottom lip, side walls, or top rim."""
     (x1, y1, z1), (x2, y2, z2) = p1, p2
 
     # 1. Check if the ball's outer skin collides with the bottom floor lip or top roof peak
@@ -365,7 +436,7 @@ def check_goal_intersection(p1, p2):
             if not is_3d or (goal_y_min - ball_radius_m <= iy_rim <= goal_y_max + ball_radius_m):
                 return "RIM_HIT", (cx, iy_rim, cz)
 
-    # 2. Check crossing of the pentagonal house entrance plane
+    # 2. Check crossing of the entrance plane
     goal_dx = goal_x2 - goal_x1
     goal_dz = goal_z2 - goal_z1
     goal_len = math.hypot(goal_dx, goal_dz)
@@ -375,13 +446,11 @@ def check_goal_intersection(p1, p2):
     if is_3d and (goal_y_max - goal_y_min) <= 2.0 * ball_radius_m:
         return False, None
 
-    # Outward normal of the open pentagonal mouth points in (side_sign_x * cos(30°), 0, sin(30°))
-    out_nx = side_sign_x * math.cos(HIVE_TILT_RAD)
-    out_nz = math.sin(HIVE_TILT_RAD)
-
-    # Reject shots coming from behind/underneath the solid HIVE floor or back wall
-    if (x2 - x1) * out_nx + (z2 - z1) * out_nz >= 0.0:
-        return False, None
+    if show_biobuzz_elements:
+        out_nx = side_sign_x * math.cos(HIVE_TILT_RAD)
+        out_nz = math.sin(HIVE_TILT_RAD)
+        if (x2 - x1) * out_nx + (z2 - z1) * out_nz >= 0.0:
+            return False, None
 
     denom = (x1 - x2) * (goal_z1 - goal_z2) - (z1 - z2) * (goal_x1 - goal_x2)
     if abs(denom) < 1e-9:
@@ -399,12 +468,17 @@ def check_goal_intersection(p1, p2):
         else:
             lat_offset = abs(iy - goal_y_center)
             if lat_offset <= (goal_half_w - ball_radius_m):
-                w_hit = u * HIVE_W_TOP
-                roof_slope = (HIVE_W_TOP - HIVE_W_EAVE) / goal_half_w
-                roof_margin = ball_radius_m * math.hypot(1.0, roof_slope)
-                max_w_allowed = HIVE_W_TOP - roof_slope * lat_offset - roof_margin
-                if ball_radius_m <= w_hit <= max_w_allowed:
-                    return True, (x1 + t * (x2 - x1), iy, z1 + t * (z2 - z1))
+                if show_biobuzz_elements:
+                    w_hit = u * HIVE_W_TOP
+                    roof_slope = (HIVE_W_TOP - HIVE_W_EAVE) / goal_half_w
+                    roof_margin = ball_radius_m * math.hypot(1.0, roof_slope)
+                    max_w_allowed = HIVE_W_TOP - roof_slope * lat_offset - roof_margin
+                    if ball_radius_m <= w_hit <= max_w_allowed:
+                        return True, (x1 + t * (x2 - x1), iy, z1 + t * (z2 - z1))
+                else:
+                    u_margin = ball_radius_m / goal_len
+                    if u_margin <= u <= 1.0 - u_margin:
+                        return True, (x1 + t * (x2 - x1), iy, z1 + t * (z2 - z1))
 
     return False, None
 
@@ -412,6 +486,9 @@ def check_goal_intersection(p1, p2):
 def check_hive_interior_collision(p1, p2):
     """After passing the entrance, checks when the ball's outer skin (ball_radius_m)
     hits the sloped bottom floor (w = 0), back wall (u = HIVE_U_IN), side walls, or roof."""
+    if not show_biobuzz_elements:
+        return False, None
+
     (x1, y1, z1), (x2, y2, z2) = p1, p2
 
     def world_to_local_uw(x, z):
@@ -424,18 +501,15 @@ def check_hive_interior_collision(p1, p2):
     u1, w1 = world_to_local_uw(x1, z1)
     u2, w2 = world_to_local_uw(x2, z2)
 
-    # Sloped bottom floor of the HIVE (w = ball_radius_m)
     if w1 > ball_radius_m and w2 <= ball_radius_m:
         frac = (w1 - ball_radius_m) / (w1 - w2)
         return True, (x1 + frac * (x2 - x1), y1 + frac * (y2 - y1), z1 + frac * (z2 - z1))
 
-    # Inner back wall (u = HIVE_U_IN + ball_radius_m)
     back_limit = HIVE_U_IN + ball_radius_m
     if u1 > back_limit and u2 <= back_limit:
         frac = (u1 - back_limit) / (u1 - u2)
         return True, (x1 + frac * (x2 - x1), y1 + frac * (y2 - y1), z1 + frac * (z2 - z1))
 
-    # Inner side walls or pitched roof inside the cell
     if is_3d:
         lat1 = abs(y1 - goal_y_center)
         lat2 = abs(y2 - goal_y_center)
@@ -560,7 +634,7 @@ consecutive_misses = 0
 for rpm in range(500, 8001, 25):
     vel_ms, s_rpm = get_launch_params(rpm)
     x_arr, y_arr, z_arr, hit_target, impact_point = compute_trajectory(
-        vel_ms, pitch_deg, active_yaw_deg, (robot_x_m, robot_y_m, height_m),
+        vel_ms, pitch_deg, active_yaw_deg, (launcher_x_m, launcher_y_m, height_m),
         gravity, use_drag, use_magnus, s_rpm, active_sidespin_deg
     )
     if hit_target:
@@ -580,8 +654,361 @@ fig_traj = go.Figure()
 anim_points = []
 
 
+def add_cylinder_mesh_3d(fig, cx, cy, z_bottom, z_top, radius, color, opacity=0.85, name="Cylinder"):
+    """Adds a closed vertical 3D cylinder mesh between z_bottom and z_top."""
+    n_seg = 24
+    theta = np.linspace(0.0, 2.0 * np.pi, n_seg, endpoint=False)
+    xs_ring = cx + radius * np.cos(theta)
+    ys_ring = cy + radius * np.sin(theta)
+
+    vx = np.concatenate([xs_ring, xs_ring, [cx, cx]]).tolist()
+    vy = np.concatenate([ys_ring, ys_ring, [cy, cy]]).tolist()
+    vz = np.concatenate([
+        np.full(n_seg, z_bottom),
+        np.full(n_seg, z_top),
+        [z_bottom, z_top]
+    ]).tolist()
+
+    i_idx, j_idx, k_idx = [], [], []
+    idx_bot_c = 2 * n_seg
+    idx_top_c = 2 * n_seg + 1
+
+    for s in range(n_seg):
+        s_next = (s + 1) % n_seg
+        b0, b1 = s, s_next
+        t0, t1 = n_seg + s, n_seg + s_next
+
+        i_idx.extend([b0, b1])
+        j_idx.extend([b1, t1])
+        k_idx.extend([t0, t0])
+
+        i_idx.extend([idx_bot_c, idx_top_c])
+        j_idx.extend([b1, t0])
+        k_idx.extend([b0, t1])
+
+    fig.add_trace(go.Mesh3d(
+        x=vx,
+        y=vy,
+        z=vz,
+        i=i_idx,
+        j=j_idx,
+        k=k_idx,
+        color=color,
+        opacity=opacity,
+        flatshading=False,
+        lighting=dict(ambient=0.75, diffuse=0.85, specular=0.25),
+        name=name,
+        showlegend=False,
+        hoverinfo="skip"
+    ))
+
+
+def add_hollow_hoop_mesh_3d(fig, cx, cy, z_bottom, z_top, r_inner, r_outer, color, opacity=0.88, name="FLOWER Hoop"):
+    """Adds an open-top hollow cylindrical hoop (ring wall + top/bottom rims) matching the BIOBUZZ FLOWER basket."""
+    n_seg = 32
+    theta = np.linspace(0.0, 2.0 * np.pi, n_seg, endpoint=False)
+    cos_t = np.cos(theta)
+    sin_t = np.sin(theta)
+
+    vx = np.concatenate([
+        cx + r_outer * cos_t,
+        cx + r_outer * cos_t,
+        cx + r_inner * cos_t,
+        cx + r_inner * cos_t
+    ]).tolist()
+    vy = np.concatenate([
+        cy + r_outer * sin_t,
+        cy + r_outer * sin_t,
+        cy + r_inner * sin_t,
+        cy + r_inner * sin_t
+    ]).tolist()
+    vz = np.concatenate([
+        np.full(n_seg, z_bottom),
+        np.full(n_seg, z_top),
+        np.full(n_seg, z_bottom),
+        np.full(n_seg, z_top)
+    ]).tolist()
+
+    i_idx, j_idx, k_idx = [], [], []
+    for s in range(n_seg):
+        sn = (s + 1) % n_seg
+        ob0, ob1 = s, sn
+        ot0, ot1 = n_seg + s, n_seg + sn
+        ib0, ib1 = 2 * n_seg + s, 2 * n_seg + sn
+        it0, it1 = 3 * n_seg + s, 3 * n_seg + sn
+
+        i_idx.extend([ob0, ob1])
+        j_idx.extend([ob1, ot1])
+        k_idx.extend([ot0, ot0])
+
+        i_idx.extend([ib0, ib1])
+        j_idx.extend([it0, ib0])
+        k_idx.extend([it1, it1])
+
+        i_idx.extend([ot0, ot1])
+        j_idx.extend([ot1, it1])
+        k_idx.extend([it0, it0])
+
+        i_idx.extend([ob0, ob1])
+        j_idx.extend([ib0, ob0])
+        k_idx.extend([ib1, ib1])
+
+    fig.add_trace(go.Mesh3d(
+        x=vx,
+        y=vy,
+        z=vz,
+        i=i_idx,
+        j=j_idx,
+        k=k_idx,
+        color=color,
+        opacity=opacity,
+        flatshading=False,
+        lighting=dict(ambient=0.8, diffuse=0.85, specular=0.3),
+        name=name,
+        showlegend=False,
+        hoverinfo="skip"
+    ))
+
+
+def get_rounded_rect_xy(rx, ry, half_len, half_wid, corner_r, n_arc=6):
+    """Returns perimeter (x, y) points for a rectangle with rounded corners."""
+    r = max(0.0, min(corner_r, half_len * 0.45, half_wid * 0.45))
+    if r <= 1e-5:
+        return [
+            (rx - half_len, ry - half_wid),
+            (rx + half_len, ry - half_wid),
+            (rx + half_len, ry + half_wid),
+            (rx - half_len, ry + half_wid),
+        ]
+
+    # Corner centers and start/end angles (CCW)
+    arcs = [
+        (rx + half_len - r, ry - half_wid + r, -0.5 * math.pi, 0.0),
+        (rx + half_len - r, ry + half_wid - r, 0.0, 0.5 * math.pi),
+        (rx - half_len + r, ry + half_wid - r, 0.5 * math.pi, math.pi),
+        (rx - half_len + r, ry - half_wid + r, math.pi, 1.5 * math.pi),
+    ]
+    pts = []
+    for cx, cy, a0, a1 in arcs:
+        for a in np.linspace(a0, a1, n_arc):
+            pts.append((cx + r * math.cos(a), cy + r * math.sin(a)))
+    return pts
+
+
+def add_rounded_box_mesh_3d(fig, rx, ry, half_len, half_wid, z_min, z_max, corner_r=0.03, color="#FFFFFF", opacity=0.93, name="Box", showlegend=False):
+    """Adds a solid 3D extruded prism with slightly rounded vertical corners."""
+    ring = get_rounded_rect_xy(rx, ry, half_len, half_wid, corner_r, n_arc=6)
+    n = len(ring)
+
+    vx = [p[0] for p in ring] + [p[0] for p in ring] + [rx, rx]
+    vy = [p[1] for p in ring] + [p[1] for p in ring] + [ry, ry]
+    vz = [z_min] * n + [z_max] * n + [z_min, z_max]
+
+    idx_bot_c = 2 * n
+    idx_top_c = 2 * n + 1
+    i_idx, j_idx, k_idx = [], [], []
+
+    for s in range(n):
+        sn = (s + 1) % n
+        b0, b1 = s, sn
+        t0, t1 = n + s, n + sn
+
+        # Side quad
+        i_idx.extend([b0, b1])
+        j_idx.extend([b1, t1])
+        k_idx.extend([t0, t0])
+
+        # Bottom & top caps
+        i_idx.extend([idx_bot_c, idx_top_c])
+        j_idx.extend([b1, t0])
+        k_idx.extend([b0, t1])
+
+    fig.add_trace(go.Mesh3d(
+        x=vx,
+        y=vy,
+        z=vz,
+        i=i_idx,
+        j=j_idx,
+        k=k_idx,
+        color=color,
+        opacity=opacity,
+        flatshading=False,
+        lighting=dict(ambient=0.85, diffuse=0.85, specular=0.2),
+        name=name,
+        showlegend=showlegend,
+        hoverinfo="skip"
+    ))
+    return ring
+
+
+def add_robot_model_3d(fig, rx, ry, lx_world, ly_world, lz, half_len, half_wid, yaw_deg, pitch_deg):
+    """Adds a white 3D FTC robot chassis (opacity=0.93) with rounded corners, cylindrical turret, and dotted light-grey launch angle line."""
+    z_floor = 0.005
+    z_bump = 0.12
+    z_deck = 0.18
+    robot_opacity = 0.93
+    corner_r = min(0.035, half_len * 0.22, half_wid * 0.22)
+    yaw_rad = math.radians(yaw_deg)
+    pitch_rad = math.radians(pitch_deg)
+    cos_y, sin_y = math.cos(yaw_rad), math.sin(yaw_rad)
+
+    robot_label = f"Robot ({int(round(half_len * 2000))}×{int(round(half_wid * 2000))} mm)"
+
+    # White chassis body with rounded corners
+    ring = add_rounded_box_mesh_3d(
+        fig,
+        rx, ry, half_len, half_wid,
+        z_floor, z_bump,
+        corner_r=corner_r,
+        color="#FFFFFF",
+        opacity=robot_opacity,
+        name=robot_label,
+        showlegend=False
+    )
+
+    # Cylindrical turret housing
+    turret_r = min(0.085, half_len * 0.45, half_wid * 0.45)
+    turret_z_top = max(z_deck, lz - 0.02)
+    add_cylinder_mesh_3d(
+        fig,
+        lx_world, ly_world,
+        z_bump, turret_z_top,
+        turret_r,
+        color="#FFFFFF",
+        opacity=robot_opacity,
+        name=robot_label
+    )
+
+    # Subtle rounded perimeter outline + turret top ring for crisp edge definition
+    closed_ring = ring + [ring[0]]
+    px, py, pz = [], [], []
+    for z_ring in (z_floor, z_bump):
+        px.extend([c[0] for c in closed_ring] + [None])
+        py.extend([c[1] for c in closed_ring] + [None])
+        pz.extend([z_ring] * len(closed_ring) + [None])
+
+    t_theta = np.linspace(0.0, 2.0 * np.pi, 25)
+    px.extend((lx_world + turret_r * np.cos(t_theta)).tolist() + [None])
+    py.extend((ly_world + turret_r * np.sin(t_theta)).tolist() + [None])
+    pz.extend(np.full_like(t_theta, turret_z_top).tolist() + [None])
+
+    fig.add_trace(go.Scatter3d(
+        x=px,
+        y=py,
+        z=pz,
+        mode="lines",
+        name=robot_label,
+        legendgroup="robot_solid_3d",
+        showlegend=False,
+        line=dict(color="rgba(24, 24, 27, 0.7)", width=2),
+        hoverinfo="skip"
+    ))
+
+    # Vertical shooter mast from cylindrical turret to launch point
+    fig.add_trace(go.Scatter3d(
+        x=[lx_world, lx_world],
+        y=[ly_world, ly_world],
+        z=[turret_z_top, lz],
+        mode="lines",
+        name=robot_label,
+        legendgroup="robot_solid_3d",
+        showlegend=True,
+        line=dict(color="rgba(255, 255, 255, 0.93)", width=5),
+        hoverinfo="skip"
+    ))
+
+    # Dotted light-grey launch angle line
+    barrel_len = 0.34
+    bx_tip = lx_world + barrel_len * math.cos(pitch_rad) * cos_y
+    by_tip = ly_world + barrel_len * math.cos(pitch_rad) * sin_y
+    bz_tip = lz + barrel_len * math.sin(pitch_rad)
+
+    fig.add_trace(go.Scatter3d(
+        x=[lx_world, bx_tip],
+        y=[ly_world, by_tip],
+        z=[lz, bz_tip],
+        mode="lines",
+        name=f"{robot_label} Launch Angle",
+        legendgroup="robot_solid_3d",
+        showlegend=False,
+        line=dict(color="#9CA3AF", width=3.5, dash="dot"),
+        hoverinfo="skip"
+    ))
+
+
+def add_robot_model_2d(fig, rx, lx_world, lz, half_len, yaw_deg, pitch_deg):
+    """Adds a white 2D side-profile robot chassis (opacity=0.93) with rounded top corners, cylindrical turret profile, and a dotted light-grey launch angle line."""
+    facing = 1.0 if math.cos(math.radians(yaw_deg)) >= 0 else -1.0
+    pitch_rad = math.radians(pitch_deg)
+
+    barrel_len = 0.34
+    bx_tip = lx_world + facing * barrel_len * math.cos(pitch_rad)
+    bz_tip = lz + barrel_len * math.sin(pitch_rad)
+    robot_label = f"Robot ({int(round(half_len * 2000))} mm L)"
+
+    # White chassis with slightly rounded upper corners
+    chassis_h = 0.13
+    r_c = min(0.025, half_len * 0.2, chassis_h * 0.35)
+    tr_ang = np.linspace(0.0, 0.5 * math.pi, 6)
+    tl_ang = np.linspace(0.5 * math.pi, math.pi, 6)
+
+    cx_pts = (
+        [rx - half_len, rx + half_len]
+        + (rx + half_len - r_c + r_c * np.cos(tr_ang)).tolist()
+        + (rx - half_len + r_c + r_c * np.cos(tl_ang)).tolist()
+        + [rx - half_len]
+    )
+    cz_pts = (
+        [0.0, 0.0]
+        + (chassis_h - r_c + r_c * np.sin(tr_ang)).tolist()
+        + (chassis_h - r_c + r_c * np.sin(tl_ang)).tolist()
+        + [0.0]
+    )
+
+    fig.add_trace(go.Scatter(
+        x=cx_pts,
+        y=cz_pts,
+        mode="lines",
+        fill="toself",
+        fillcolor="rgba(255, 255, 255, 0.93)",
+        name=robot_label,
+        legendgroup="robot_solid_2d",
+        showlegend=True,
+        line=dict(color="rgba(255, 255, 255, 0.95)", width=2),
+        hoverinfo="skip"
+    ))
+
+    # Cylindrical turret side profile + vertical mast
+    turret_r = min(0.075, half_len * 0.4)
+    turret_top = max(0.18, lz - 0.02)
+    fig.add_trace(go.Scatter(
+        x=[lx_world - turret_r, lx_world + turret_r, lx_world + turret_r, lx_world - turret_r, lx_world - turret_r],
+        y=[chassis_h, chassis_h, turret_top, turret_top, chassis_h],
+        mode="lines",
+        fill="toself",
+        fillcolor="rgba(255, 255, 255, 0.93)",
+        name=robot_label,
+        legendgroup="robot_solid_2d",
+        showlegend=False,
+        line=dict(color="rgba(255, 255, 255, 0.95)", width=1.5),
+        hoverinfo="skip"
+    ))
+
+    # Dotted light-grey launch angle line
+    fig.add_trace(go.Scatter(
+        x=[lx_world, bx_tip],
+        y=[lz, bz_tip],
+        mode="lines",
+        name=f"{robot_label} Launch Angle",
+        legendgroup="robot_solid_2d",
+        showlegend=False,
+        line=dict(color="#9CA3AF", width=3, dash="dot"),
+        hoverinfo="skip"
+    ))
+
+
 def add_biobuzz_field_elements(fig, red_selected, left_up):
-    """Adds 2026-2027 BIOBUZZ game elements with the PENTAGONAL HOUSE OPENING facing outward (+/-X)."""
+    """Adds 2026-2027 BIOBUZZ game elements (all hidden from legend for a clean HUD)."""
     bx = HIVE_FRAME_X / 2.0
     by = HIVE_FRAME_Y / 2.0
 
@@ -609,13 +1036,18 @@ def add_biobuzz_field_elements(fig, red_selected, left_up):
         z=frame_z,
         mode="lines",
         name="HIVE A-Frame",
+        showlegend=False,
         line=dict(color="rgba(255, 255, 255, 0.55)", width=4),
         hoverinfo="skip"
     ))
 
+    # Red & Blue seesaws tilt in opposite directions (Red up on one side, Blue up on the opposite side)
+    red_left_up = left_up if red_selected else (not left_up)
+    blue_left_up = (not left_up) if red_selected else left_up
+
     seesaws = [
-        (-1.0, "Red HIVE", "#EF4444", red_selected),
-        (1.0, "Blue HIVE", "#3B82F6", not red_selected)
+        (-1.0, "Red HIVE", "#EF4444", red_selected, red_left_up),
+        (1.0, "Blue HIVE", "#3B82F6", not red_selected, blue_left_up)
     ]
 
     hw = HIVE_OUTER_W / 2.0
@@ -627,7 +1059,7 @@ def add_biobuzz_field_elements(fig, red_selected, left_up):
         z_w = HIVE_AXLE_Z + u_local * math.sin(alpha) + w_local * math.cos(alpha)
         return cell_side * r_x, y_val, z_w
 
-    for y_sign, base_label, color_hex, is_alliance_target in seesaws:
+    for y_sign, base_label, color_hex, is_alliance_target, seesaw_left_up in seesaws:
         yc = y_sign * HIVE_PIVOT_Y
         rx, ry, rz = [], [], []
 
@@ -641,7 +1073,7 @@ def add_biobuzz_field_elements(fig, red_selected, left_up):
         ]
 
         for cell_side in (-1.0, 1.0):
-            is_up = (cell_side < 0 and left_up) or (cell_side > 0 and not left_up)
+            is_up = (cell_side < 0 and seesaw_left_up) or (cell_side > 0 and not seesaw_left_up)
 
             p_piv = (0.0, yc, HIVE_AXLE_Z)
             p_arm_end = beam_to_world(HIVE_U_OUT, yc, 0.0, cell_side, is_up)
@@ -681,7 +1113,7 @@ def add_biobuzz_field_elements(fig, red_selected, left_up):
                     j=[1, 2, 3],
                     k=[2, 3, 4],
                     color=color_hex,
-                    opacity=0.28 if is_alliance_target else 0.08,
+                    opacity=0.28 if is_alliance_target else 0.14,
                     name=f"{base_label} Pentagonal Entrance",
                     showlegend=False,
                     hoverinfo="skip"
@@ -694,26 +1126,41 @@ def add_biobuzz_field_elements(fig, red_selected, left_up):
             z=rz,
             mode="lines",
             name=label,
+            showlegend=False,
             line=dict(color=color_hex, width=5 if is_alliance_target else 3.5),
             hovertemplate=f"{label}: (%{{x:.2f}}, %{{y:.2f}}, %{{z:.2f}} m)<extra></extra>"
         ))
 
-    flower_theta = np.linspace(0, 2 * np.pi, 28)
+    # 4 Perimeter FLOWERS (Manual Section 11.4.3): Completely green (#22C55E)
+    flower_green = "#22C55E"
+    flower_theta = np.linspace(0, 2 * np.pi, 36)
     flowers_spec = [
-        (-TILE_STEP, FIELD_HALF - FLOWER_OUTER_R, FLOWER_Z),
-        (FIELD_HALF - FLOWER_OUTER_R, TILE_STEP, FLOWER_Z),
-        (TILE_STEP, -FIELD_HALF + FLOWER_OUTER_R, FLOWER_Z),
-        (-FIELD_HALF + FLOWER_OUTER_R, -TILE_STEP, FLOWER_Z),
+        (-TILE_STEP, FIELD_HALF - FLOWER_OUTER_R, -TILE_STEP, FIELD_HALF - FLOWER_POST_R, FLOWER_Z),
+        (FIELD_HALF - FLOWER_OUTER_R, TILE_STEP, FIELD_HALF - FLOWER_POST_R, TILE_STEP, FLOWER_Z),
+        (TILE_STEP, -FIELD_HALF + FLOWER_OUTER_R, TILE_STEP, -FIELD_HALF + FLOWER_POST_R, FLOWER_Z),
+        (-FIELD_HALF + FLOWER_OUTER_R, -TILE_STEP, -FIELD_HALF + FLOWER_POST_R, -TILE_STEP, FLOWER_Z),
     ]
 
     fl_x, fl_y, fl_z = [], [], []
-    for cx, cy, cz in flowers_spec:
-        ring_x = cx + FLOWER_OUTER_R * np.cos(flower_theta)
-        ring_y = cy + FLOWER_OUTER_R * np.sin(flower_theta)
-        ring_z = np.full_like(flower_theta, cz)
-        fl_x.extend(ring_x.tolist() + [None])
-        fl_y.extend(ring_y.tolist() + [None])
-        fl_z.extend(ring_z.tolist() + [None])
+    hoop_bottom_z = FLOWER_Z - FLOWER_HOOP_H
+    for cx, cy, px, py, cz in flowers_spec:
+        add_cylinder_mesh_3d(
+            fig, px, py, 0.0, cz, FLOWER_POST_R,
+            color=flower_green, opacity=0.90, name="FLOWER Support Mast"
+        )
+        add_hollow_hoop_mesh_3d(
+            fig, cx, cy, hoop_bottom_z, cz, FLOWER_INNER_R, FLOWER_OUTER_R,
+            color=flower_green, opacity=0.90, name="FLOWER Hoop"
+        )
+
+        out_x = cx + FLOWER_OUTER_R * np.cos(flower_theta)
+        out_y = cy + FLOWER_OUTER_R * np.sin(flower_theta)
+        in_x = cx + FLOWER_INNER_R * np.cos(flower_theta)
+        in_y = cy + FLOWER_INNER_R * np.sin(flower_theta)
+
+        fl_x.extend(out_x.tolist() + [None] + in_x.tolist() + [None])
+        fl_y.extend(out_y.tolist() + [None] + in_y.tolist() + [None])
+        fl_z.extend(np.full_like(flower_theta, cz).tolist() + [None] + np.full_like(flower_theta, cz).tolist() + [None])
 
     fig.add_trace(go.Scatter3d(
         x=fl_x,
@@ -721,51 +1168,60 @@ def add_biobuzz_field_elements(fig, red_selected, left_up):
         z=fl_z,
         mode="lines",
         name='4 FLOWERS (32.5" H)',
-        line=dict(color="#FACC15", width=3.5),
-        hovertemplate="FLOWER Ring: (%{x:.2f}, %{y:.2f}, %{z:.2f} m)<extra></extra>"
+        showlegend=False,
+        line=dict(color=flower_green, width=3),
+        hovertemplate="FLOWER Rim (32.5\" H): (%{x:.2f}, %{y:.2f}, %{z:.2f} m)<extra></extra>"
     ))
 
-    red_lz_yc = 1.5 * TILE_STEP
+    # Red Parking / Robot Pre-load Zone (along -Y wall, X in [-TILE_STEP - LZ_WIDTH, -TILE_STEP])
+    red_lz_x_right = -TILE_STEP
+    red_lz_x_left = red_lz_x_right - LZ_WIDTH
     fig.add_trace(go.Scatter3d(
-        x=[-FIELD_HALF, -FIELD_HALF + LZ_DEPTH, -FIELD_HALF + LZ_DEPTH, -FIELD_HALF, -FIELD_HALF],
-        y=[red_lz_yc - LZ_WIDTH / 2, red_lz_yc - LZ_WIDTH / 2, red_lz_yc + LZ_WIDTH / 2, red_lz_yc + LZ_WIDTH / 2, red_lz_yc - LZ_WIDTH / 2],
+        x=[red_lz_x_left, red_lz_x_right, red_lz_x_right, red_lz_x_left, red_lz_x_left],
+        y=[-FIELD_HALF, -FIELD_HALF, -FIELD_HALF + LZ_DEPTH, -FIELD_HALF + LZ_DEPTH, -FIELD_HALF],
         z=[0.003] * 5,
         mode="lines",
-        name="Red Loading Zone (A5)",
+        name="Red Loading / Parking Zone",
+        showlegend=False,
         line=dict(color="#EF4444", width=3.5),
         hoverinfo="skip"
     ))
 
-    blue_lz_yc = -1.5 * TILE_STEP
+    # Blue Parking / Robot Pre-load Zone (along +Y wall, X in [TILE_STEP, TILE_STEP + LZ_WIDTH])
+    blue_lz_x_left = TILE_STEP
+    blue_lz_x_right = blue_lz_x_left + LZ_WIDTH
     fig.add_trace(go.Scatter3d(
-        x=[FIELD_HALF - LZ_DEPTH, FIELD_HALF, FIELD_HALF, FIELD_HALF - LZ_DEPTH, FIELD_HALF - LZ_DEPTH],
-        y=[blue_lz_yc - LZ_WIDTH / 2, blue_lz_yc - LZ_WIDTH / 2, blue_lz_yc + LZ_WIDTH / 2, blue_lz_yc + LZ_WIDTH / 2, blue_lz_yc - LZ_WIDTH / 2],
+        x=[blue_lz_x_left, blue_lz_x_right, blue_lz_x_right, blue_lz_x_left, blue_lz_x_left],
+        y=[FIELD_HALF - LZ_DEPTH, FIELD_HALF - LZ_DEPTH, FIELD_HALF, FIELD_HALF, FIELD_HALF - LZ_DEPTH],
         z=[0.003] * 5,
         mode="lines",
-        name="Blue Loading Zone (F2)",
+        name="Blue Loading / Parking Zone",
+        showlegend=False,
         line=dict(color="#3B82F6", width=3.5),
         hoverinfo="skip"
     ))
 
-    red_g_xc = -FIELD_HALF + TILE_STEP / 2.0
+    # Red GARDEN (along +X wall at bottom-right corner +X = +FIELD_HALF, -Y = -FIELD_HALF)
     fig.add_trace(go.Scatter3d(
-        x=[red_g_xc - GARDEN_WIDTH / 2, red_g_xc + GARDEN_WIDTH / 2, red_g_xc + GARDEN_WIDTH / 2, red_g_xc - GARDEN_WIDTH / 2, red_g_xc - GARDEN_WIDTH / 2],
-        y=[-FIELD_HALF, -FIELD_HALF, -FIELD_HALF + GARDEN_DEPTH, -FIELD_HALF + GARDEN_DEPTH, -FIELD_HALF],
+        x=[FIELD_HALF - GARDEN_DEPTH, FIELD_HALF, FIELD_HALF, FIELD_HALF - GARDEN_DEPTH, FIELD_HALF - GARDEN_DEPTH],
+        y=[-FIELD_HALF, -FIELD_HALF, -FIELD_HALF + GARDEN_WIDTH, -FIELD_HALF + GARDEN_WIDTH, -FIELD_HALF],
         z=[0.003] * 5,
         mode="lines",
-        name="Red GARDEN (A1)",
-        line=dict(color="#EF4444", width=3, dash="dot"),
+        name="Red GARDEN",
+        showlegend=False,
+        line=dict(color="#EF4444", width=3.5, dash="dot"),
         hoverinfo="skip"
     ))
 
-    blue_g_xc = FIELD_HALF - TILE_STEP / 2.0
+    # Blue GARDEN (along -X wall at top-left corner -X = -FIELD_HALF, +Y = +FIELD_HALF)
     fig.add_trace(go.Scatter3d(
-        x=[blue_g_xc - GARDEN_WIDTH / 2, blue_g_xc + GARDEN_WIDTH / 2, blue_g_xc + GARDEN_WIDTH / 2, blue_g_xc - GARDEN_WIDTH / 2, blue_g_xc - GARDEN_WIDTH / 2],
-        y=[FIELD_HALF - GARDEN_DEPTH, FIELD_HALF - GARDEN_DEPTH, FIELD_HALF, FIELD_HALF, FIELD_HALF - GARDEN_DEPTH],
+        x=[-FIELD_HALF, -FIELD_HALF + GARDEN_DEPTH, -FIELD_HALF + GARDEN_DEPTH, -FIELD_HALF, -FIELD_HALF],
+        y=[FIELD_HALF - GARDEN_WIDTH, FIELD_HALF - GARDEN_WIDTH, FIELD_HALF, FIELD_HALF, FIELD_HALF - GARDEN_WIDTH],
         z=[0.003] * 5,
         mode="lines",
-        name="Blue GARDEN (F6)",
-        line=dict(color="#3B82F6", width=3, dash="dot"),
+        name="Blue GARDEN",
+        showlegend=False,
+        line=dict(color="#3B82F6", width=3.5, dash="dot"),
         hoverinfo="skip"
     ))
 
@@ -777,12 +1233,12 @@ def add_biobuzz_field_elements_2d(fig, red_selected, left_up):
     hive_fill = "rgba(142, 142, 147, 0.14)"
     hive_label = "Red HIVE" if red_selected else "Blue HIVE"
 
-    # 1. Central HIVE A-Frame Stand & Pivot Axle
     fig.add_trace(go.Scatter(
         x=[-bx, 0.0, bx, -bx],
         y=[0.0, HIVE_AXLE_Z, 0.0, 0.0],
         mode="lines",
         name="HIVE A-Frame",
+        showlegend=False,
         line=dict(color="rgba(255, 255, 255, 0.40)", width=3),
         hoverinfo="skip"
     ))
@@ -793,7 +1249,6 @@ def add_biobuzz_field_elements_2d(fig, red_selected, left_up):
         z_w = HIVE_AXLE_Z + u_local * math.sin(alpha) + w_local * math.cos(alpha)
         return cell_side * r_x, z_w
 
-    # 2. Only the Active Raised ("Up") Alliance Seesaw Cell
     cell_side = -1.0 if left_up else 1.0
     p_piv = (0.0, HIVE_AXLE_Z)
     p_floor_in = beam_to_xz(HIVE_U_IN, 0.0, cell_side, True)
@@ -803,18 +1258,17 @@ def add_biobuzz_field_elements_2d(fig, red_selected, left_up):
     p_roof_in = beam_to_xz(HIVE_U_IN, HIVE_W_TOP, cell_side, True)
     p_eave_in = beam_to_xz(HIVE_U_IN, HIVE_W_EAVE, cell_side, True)
 
-    # Seesaw support arm from central pivot axle to outer floor lip
     fig.add_trace(go.Scatter(
         x=[p_piv[0], p_floor_out[0]],
         y=[p_piv[1], p_floor_out[1]],
         mode="lines",
         name=f"{hive_label} Seesaw",
         legendgroup="hive_2d_body",
+        showlegend=False,
         line=dict(color=hive_color, width=4),
         hoverinfo="skip"
     ))
 
-    # Solid cell enclosure (bottom floor, inner back wall, pitched roof; front entrance left open)
     wall_pts = [p_floor_out, p_floor_in, p_roof_in, p_roof_out]
     fig.add_trace(go.Scatter(
         x=[p[0] for p in wall_pts],
@@ -829,7 +1283,6 @@ def add_biobuzz_field_elements_2d(fig, red_selected, left_up):
         hoverinfo="skip"
     ))
 
-    # Eave ridge line along the side wall
     fig.add_trace(go.Scatter(
         x=[p_eave_in[0], p_eave_out[0]],
         y=[p_eave_in[1], p_eave_out[1]],
@@ -840,12 +1293,12 @@ def add_biobuzz_field_elements_2d(fig, red_selected, left_up):
         hoverinfo="skip"
     ))
 
-    # Central Pivot Axle Pin
     fig.add_trace(go.Scatter(
         x=[0.0],
         y=[HIVE_AXLE_Z],
         mode="markers",
         name="HIVE Pivot Axle",
+        showlegend=False,
         marker=dict(size=8, color="#FFFFFF", line=dict(color="#000000", width=1.5)),
         hovertemplate=f"HIVE Pivot Axle: (0.00 m, {HIVE_AXLE_Z:.2f} m)<extra></extra>"
     ))
@@ -947,15 +1400,20 @@ if is_3d:
             )
         ))
 
-    # Launcher 3D Node (identified by name === 'Launcher' in JS Shift+Drag)
+    # White 3D FTC Robot Chassis (opacity=0.93) + Cylindrical Turret + Dotted Light-Grey Launch Angle Line
+    add_robot_model_3d(
+        fig_traj, robot_x_m, robot_y_m, launcher_x_m, launcher_y_m, height_m,
+        half_robot_len_m, half_robot_wid_m, active_yaw_deg, pitch_deg
+    )
+
     fig_traj.add_trace(go.Scatter3d(
-        x=[robot_x_m],
-        y=[robot_y_m],
+        x=[launcher_x_m],
+        y=[launcher_y_m],
         z=[height_m],
         mode='markers',
         name='Launcher',
         marker=dict(size=7, color='#FFFFFF', symbol='circle-open', line=dict(width=3)),
-        hovertemplate="Launcher (Shift+Drag to move): (%{x:.2f}, %{y:.2f}, %{z:.2f} m)<extra></extra>"
+        hovertemplate="Launcher (Shift+Drag to move Robot): (%{x:.2f}, %{y:.2f}, %{z:.2f} m)<extra></extra>"
     ))
 
     # 12ft x 12ft (3.6576m x 3.6576m) FTC Field Centered at (0.0, 0.0)
@@ -968,7 +1426,7 @@ if is_3d:
             j=[1, 2],
             k=[2, 3],
             color="#0D0D0D",
-            opacity=0.85,
+            opacity=0.5,
             name="FTC Field Floor",
             showlegend=False,
             hoverinfo="skip"
@@ -991,17 +1449,18 @@ if is_3d:
             z=grid_z,
             mode="lines",
             name='FTC Tile Grid (24")',
+            showlegend=False,
             line=dict(color="rgba(255, 255, 255, 0.14)", width=1.5),
             hoverinfo="skip"
         ))
 
-        # Center Line at X = 0.0 and Origin Marker at (0.0, 0.0)
         fig_traj.add_trace(go.Scatter3d(
             x=[0.0, 0.0],
             y=[-FIELD_HALF, FIELD_HALF],
             z=[0.002, 0.002],
             mode="lines",
             name="Center Line (X = 0.0)",
+            showlegend=False,
             line=dict(color="rgba(255, 255, 255, 0.35)", width=3, dash="dash"),
             hoverinfo="skip"
         ))
@@ -1012,11 +1471,11 @@ if is_3d:
             z=[0.004],
             mode="markers",
             name="Field Origin (0.0, 0.0)",
+            showlegend=False,
             marker=dict(size=4, color="#FFFFFF", symbol="cross"),
             hovertemplate="Field Center: (0.00, 0.00, 0.00 m)<extra></extra>"
         ))
 
-        # Perimeter Walls spanning [-FIELD_HALF, +FIELD_HALF]
         wx = [
             -FIELD_HALF, FIELD_HALF, FIELD_HALF, -FIELD_HALF, -FIELD_HALF, None,
             -FIELD_HALF, FIELD_HALF, FIELD_HALF, -FIELD_HALF, -FIELD_HALF, None,
@@ -1042,6 +1501,7 @@ if is_3d:
             z=wz,
             mode="lines",
             name="FTC Perimeter Walls",
+            showlegend=False,
             line=dict(color="rgba(255, 255, 255, 0.32)", width=2.5),
             hoverinfo="skip"
         ))
@@ -1057,8 +1517,8 @@ if is_3d:
         max_traj_x, max_traj_y, max_traj_z = 0.0, 0.0, 0.0
 
     field_xy_bound = 1.85 if show_ftc_field else 1.5
-    x_bound = max(field_xy_bound, abs(goal_x1) + 0.4, abs(goal_x2) + 0.4, abs(robot_x_m) + 0.4, max_traj_x + 0.3)
-    y_bound = max(field_xy_bound, abs(goal_y_center) + goal_half_w + 0.4, abs(robot_y_m) + 0.4, max_traj_y + 0.3)
+    x_bound = max(field_xy_bound, abs(goal_x1) + 0.4, abs(goal_x2) + 0.4, abs(robot_x_m) + half_robot_len_m + 0.2, max_traj_x + 0.3)
+    y_bound = max(field_xy_bound, abs(goal_y_center) + goal_half_w + 0.4, abs(robot_y_m) + half_robot_wid_m + 0.2, max_traj_y + 0.3)
     max_z_range = max(2.2, goal_z2 + 0.5, height_m + 0.5, max_traj_z + 0.3)
 
     axis_style = dict(
@@ -1160,32 +1620,35 @@ else:
             )
         ))
 
-    # 2D BIOBUZZ HIVE Structure (A-Frame, Active Raised Seesaw Arm, Sloped Bottom Floor, Back Wall & Roof)
     if show_ftc_field and show_biobuzz_elements:
         add_biobuzz_field_elements_2d(fig_traj, is_red_hive, is_left_up)
 
-    # 2D Target HIVE Entrance Line (dashed plane showing scoring opening)
     fig_traj.add_trace(go.Scatter(
         x=[goal_x1, goal_x2],
         y=[goal_z1, goal_z2],
         mode='lines+markers',
         name=f"{'Red' if is_red_hive else 'Blue'} Entrance ({raised_side})",
+        showlegend=False,
         line=dict(color='#FFFFFF', width=2.5, dash='dash'),
         marker=dict(size=7, color='#8E8E93', line=dict(color='#FFFFFF', width=1.5)),
-        hovertemplate="HIVE Entrance: (%{x:.2f} m, %{y:.2f} m)<extra></extra>"
+        hovertemplate="Target Entrance: (%{x:.2f} m, %{y:.2f} m)<extra></extra>"
     ))
 
-    # 2D Launcher Node
+    # White 2D Robot Side Profile (opacity=0.93) + Cylindrical Turret + Dotted Light-Grey Launch Angle Line
+    add_robot_model_2d(
+        fig_traj, robot_x_m, launcher_x_m, height_m,
+        half_robot_len_m, active_yaw_deg, pitch_deg
+    )
+
     fig_traj.add_trace(go.Scatter(
-        x=[robot_x_m],
+        x=[launcher_x_m],
         y=[height_m],
         mode='markers',
         name='Launcher',
         marker=dict(size=10, color='#FFFFFF', symbol='circle-open', line=dict(width=3)),
-        hovertemplate="Launcher (Shift+Drag to move in X): (%{x:.2f} m, %{y:.2f} m)<extra></extra>"
+        hovertemplate="Launcher (Shift+Drag to move Robot in X): (%{x:.2f} m, %{y:.2f} m)<extra></extra>"
     ))
 
-    # 2D Field Center Line & Walls
     if show_ftc_field:
         fig_traj.add_vline(
             x=0.0,
@@ -1200,6 +1663,7 @@ else:
             y=[0.0, WALL_H, None, 0.0, WALL_H],
             mode='lines',
             name='Perimeter Walls',
+            showlegend=False,
             line=dict(color='rgba(255, 255, 255, 0.45)', width=3),
             hoverinfo='skip'
         ))
@@ -1243,7 +1707,7 @@ else:
         height=560
     )
 
-# Render interactive Plotly chart with Shift+Drag Launcher positioning & smooth client-side animation
+# Render interactive Plotly chart with Shift+Drag Robot positioning & smooth client-side animation
 fig_json = fig_traj.to_json()
 frames_json = json.dumps(anim_points)
 is_3d_js = "true" if is_3d else "false"
@@ -1311,7 +1775,7 @@ html_code = f"""
 <body>
 <div id="wrapper">
   {"<button id='playBtn'>&#9654;&nbsp; Play Shot</button>" if len(anim_points) > 0 else ""}
-  <div id='dragHint'>Hold <b>Shift + Drag</b> to move Launcher {"in X-Y" if is_3d else "in X"}</div>
+  <div id='dragHint'>Hold <b>Shift + Drag</b> to move Robot {"in X-Y" if is_3d else "in X"}</div>
   <div id="chart"></div>
 </div>
 <script>
@@ -1320,13 +1784,28 @@ html_code = f"""
   const is3D = {is_3d_js};
   const hasFrames = {has_frames_js};
   const launchZ = {height_m};
+  const initRobotX = {robot_x_m};
+  const initRobotY = {robot_y_m};
+  const initLauncherX = {launcher_x_m};
+  const initLauncherY = {launcher_y_m};
+  const minRobotX = {min_robot_x_m};
+  const maxRobotX = {max_robot_x_m};
+  const minRobotY = {min_robot_y_m};
+  const maxRobotY = {max_robot_y_m};
   const gd = document.getElementById('chart');
+
+  function clampRobotX(val) {{
+    return Math.max(minRobotX, Math.min(maxRobotX, val));
+  }}
+
+  function clampRobotY(val) {{
+    return Math.max(minRobotY, Math.min(maxRobotY, val));
+  }}
 
   function syncStreamlitNumberInput(labelText, newValue) {{
     try {{
       const doc = window.parent.document;
 
-      // 1. Ensure the "Robot Location" expander is open so its number inputs are mounted in the DOM
       const expanders = Array.from(doc.querySelectorAll('[data-testid="stSidebar"] [data-testid="stExpander"]'));
       for (const exp of expanders) {{
         if (exp.textContent && exp.textContent.includes('Robot Location')) {{
@@ -1338,7 +1817,6 @@ html_code = f"""
         }}
       }}
 
-      // 2. Locate the target number input by textContent and commit the value via focus + input + change + blur
       setTimeout(() => {{
         const inputs = Array.from(doc.querySelectorAll('[data-testid="stSidebar"] input[type="number"]'));
         for (const inp of inputs) {{
@@ -1361,7 +1839,6 @@ html_code = f"""
     }}
   }}
 
-  // 2D pixel-to-world X converter using Plotly's Cartesian xaxis
   function map2DPixelToX(clientX) {{
     const fullLayout = gd._fullLayout;
     if (!fullLayout || !fullLayout.xaxis || !fullLayout._size) return null;
@@ -1372,12 +1849,11 @@ html_code = f"""
     if (!Number.isFinite(worldX)) return null;
 
     return {{
-      x: Math.max(-1.829, Math.min(1.829, worldX)),
+      x: worldX,
       y: null
     }};
   }}
 
-    // Project a 3D world point (wx, wy, wz) into screen pixels (px, py) matching Plotly's gl-plot3d
   function projectWorldToScreen(wx, wy, wz) {{
     const sceneLayout = gd._fullLayout && gd._fullLayout.scene;
     if (!sceneLayout) return null;
@@ -1392,7 +1868,6 @@ html_code = f"""
     const midY = 0.5 * (yRange[0] + yRange[1]);
     const midZ = 0.5 * (zRange[0] + zRange[1]);
 
-    // Plotly gl-plot3d normalizes data ranges to [-0.5, 0.5] (unit box), then multiplies by aspectratio
     const ar = sceneLayout.aspectratio || {{ x: 1, y: 1, z: 1 }};
     const bx = ((wx - midX) / spanX) * ar.x;
     const by = ((wy - midY) / spanY) * ar.y;
@@ -1401,7 +1876,6 @@ html_code = f"""
     const rect = gd.getBoundingClientRect();
     const glplot = sceneLayout._scene && sceneLayout._scene.glplot;
 
-    // 1. Read exact WebGL view & projection Float32Array(16) matrices from glplot
     let vMat = null;
     let pMat = null;
     if (glplot) {{
@@ -1438,7 +1912,6 @@ html_code = f"""
       }}
     }}
 
-    // 2. Exact fallback using Plotly's [-0.5, 0.5] box camera eye / center / up
     const cam = sceneLayout.camera;
     if (!cam) return null;
 
@@ -1468,15 +1941,13 @@ html_code = f"""
     }};
   }}
 
-  // Build local 2x2 screen-to-world Jacobian at (x0, y0, launchZ) so cursor movement tracks 1:1
   function buildDragMapper(x0, y0, z0) {{
-    const eps = 0.05; // 50 mm finite difference step
+    const eps = 0.05;
     const p0 = projectWorldToScreen(x0, y0, z0);
     const px = projectWorldToScreen(x0 + eps, y0, z0);
     const py = projectWorldToScreen(x0, y0 + eps, z0);
     if (!p0 || !px || !py) return null;
 
-    // J = [ dScreen/dX , dScreen/dY ]
     const j11 = (px.px - p0.px) / eps;
     const j21 = (px.py - p0.py) / eps;
     const j12 = (py.px - p0.px) / eps;
@@ -1518,58 +1989,75 @@ html_code = f"""
     displaylogo: false
   }}).then(() => {{
     const launcherTraceIdx = fig.data.findIndex(t => t.name === 'Launcher');
+
+    const robotTraceIndices = [];
+    const baseRobotCoords = {{}};
+    fig.data.forEach((t, idx) => {{
+      if (t.name && t.name.startsWith('Robot')) {{
+        robotTraceIndices.push(idx);
+        baseRobotCoords[idx] = {{
+          x: [...gd.data[idx].x],
+          y: [...gd.data[idx].y]
+        }};
+      }}
+    }});
+
     const hintEl = document.getElementById('dragHint');
     let isDraggingLauncher = false;
-    let lastDraggedPos = null;
+    let currentRobotWorld = {{ x: initRobotX, y: initRobotY }};
+    let lastDraggedRobotPos = null;
     let dragOriginMouse = {{ x: 0, y: 0 }};
-    let dragOriginWorld = {{ x: 0, y: 0 }};
+    let dragOriginRobotWorld = {{ x: initRobotX, y: initRobotY }};
     let deltaMapper3D = null;
 
-    function getCurrentLauncherXY() {{
-      if (launcherTraceIdx === -1) return {{ x: 0, y: 0 }};
-      const tr = gd.data[launcherTraceIdx];
-      return {{
-        x: Array.isArray(tr.x) ? tr.x[0] : 0,
-        y: Array.isArray(tr.y) ? tr.y[0] : 0
-      }};
-    }}
-
-    function updateLauncherPos(clientX, clientY) {{
+    function updateRobotPos(clientX, clientY) {{
       if (launcherTraceIdx === -1) return;
 
-      let newX, newY = null;
+      let newRobotX, newRobotY = null;
 
       if (is3D) {{
         if (!deltaMapper3D) return;
         const dPx = clientX - dragOriginMouse.x;
         const dPy = clientY - dragOriginMouse.y;
         const delta = deltaMapper3D(dPx, dPy);
-        newX = Math.max(-1.829, Math.min(1.829, dragOriginWorld.x + delta.dx));
-        newY = Math.max(-1.829, Math.min(1.829, dragOriginWorld.y + delta.dy));
+        newRobotX = clampRobotX(dragOriginRobotWorld.x + delta.dx);
+        newRobotY = clampRobotY(dragOriginRobotWorld.y + delta.dy);
       }} else {{
         const hit = map2DPixelToX(clientX);
         if (!hit) return;
-        newX = Math.max(-1.829, Math.min(1.829, dragOriginWorld.x + (hit.x - dragOriginMouse.x)));
+        newRobotX = clampRobotX(dragOriginRobotWorld.x + (hit.x - dragOriginMouse.x));
       }}
 
-      lastDraggedPos = {{ x: newX, y: newY }};
+      currentRobotWorld = {{ x: newRobotX, y: is3D ? newRobotY : 0 }};
+      lastDraggedRobotPos = {{ x: newRobotX, y: newRobotY }};
+      const shiftX = newRobotX - initRobotX;
+      const shiftY = is3D ? (newRobotY - initRobotY) : 0;
 
       if (is3D) {{
         Plotly.restyle(gd, {{
-          x: [[newX]],
-          y: [[newY]]
+          x: [[initLauncherX + shiftX]],
+          y: [[initLauncherY + shiftY]]
         }}, [launcherTraceIdx]);
 
+        robotTraceIndices.forEach(idx => {{
+          const shiftedX = baseRobotCoords[idx].x.map(v => v === null ? null : v + shiftX);
+          const shiftedY = baseRobotCoords[idx].y.map(v => v === null ? null : v + shiftY);
+          Plotly.restyle(gd, {{ x: [shiftedX], y: [shiftedY] }}, [idx]);
+        }});
+
         if (hintEl) {{
-          hintEl.innerHTML = `Launcher: <b>X = ${{Math.round(newX * 1000)}} mm</b>, <b>Y = ${{Math.round(newY * 1000)}} mm</b>`;
+          hintEl.innerHTML = `Robot Center: <b>X = ${{Math.round(newRobotX * 1000)}} mm</b>, <b>Y = ${{Math.round(newRobotY * 1000)}} mm</b>`;
         }}
       }} else {{
-        Plotly.restyle(gd, {{
-          x: [[newX]]
-        }}, [launcherTraceIdx]);
+        Plotly.restyle(gd, {{ x: [[initLauncherX + shiftX]] }}, [launcherTraceIdx]);
+
+        robotTraceIndices.forEach(idx => {{
+          const shiftedX = baseRobotCoords[idx].x.map(v => v === null ? null : v + shiftX);
+          Plotly.restyle(gd, {{ x: [shiftedX] }}, [idx]);
+        }});
 
         if (hintEl) {{
-          hintEl.innerHTML = `Launcher: <b>X = ${{Math.round(newX * 1000)}} mm</b>`;
+          hintEl.innerHTML = `Robot Center: <b>X = ${{Math.round(newRobotX * 1000)}} mm</b>`;
         }}
       }}
     }}
@@ -1582,13 +2070,13 @@ html_code = f"""
         isDraggingLauncher = true;
         gd.style.cursor = 'grabbing';
 
-        dragOriginWorld = getCurrentLauncherXY();
+        dragOriginRobotWorld = {{ x: currentRobotWorld.x, y: currentRobotWorld.y }};
         if (is3D) {{
           dragOriginMouse = {{ x: e.clientX, y: e.clientY }};
-          deltaMapper3D = buildDragMapper(dragOriginWorld.x, dragOriginWorld.y, launchZ);
+          deltaMapper3D = buildDragMapper(dragOriginRobotWorld.x, dragOriginRobotWorld.y, launchZ);
         }} else {{
           const hit = map2DPixelToX(e.clientX);
-          dragOriginMouse = {{ x: hit ? hit.x : dragOriginWorld.x, y: 0 }};
+          dragOriginMouse = {{ x: hit ? hit.x : dragOriginRobotWorld.x, y: 0 }};
         }}
       }}
     }}
@@ -1598,7 +2086,7 @@ html_code = f"""
       e.stopImmediatePropagation();
       e.stopPropagation();
       e.preventDefault();
-      updateLauncherPos(e.clientX, e.clientY);
+      updateRobotPos(e.clientX, e.clientY);
     }}
 
     function onDragEnd(e) {{
@@ -1610,19 +2098,25 @@ html_code = f"""
 
       if (hintEl) {{
         hintEl.innerHTML = is3D
-          ? 'Hold <b>Shift + Drag</b> to move Launcher in X-Y'
-          : 'Hold <b>Shift + Drag</b> to move Launcher in X';
+          ? 'Hold <b>Shift + Drag</b> to move Robot in X-Y'
+          : 'Hold <b>Shift + Drag</b> to move Robot in X';
       }}
 
-      if (lastDraggedPos) {{
-        const newXmm = Math.round((lastDraggedPos.x * 1000) / 10) * 10;
-        syncStreamlitNumberInput('Robot X [mm]', newXmm);
+      if (lastDraggedRobotPos) {{
+        const clampedXmm = Math.max(
+          Math.ceil((minRobotX * 1000) / 10) * 10,
+          Math.min(Math.floor((maxRobotX * 1000) / 10) * 10, Math.round((lastDraggedRobotPos.x * 1000) / 10) * 10)
+        );
+        syncStreamlitNumberInput('Robot X [mm]', clampedXmm);
 
-        if (is3D && lastDraggedPos.y !== null) {{
-          const newYmm = Math.round((lastDraggedPos.y * 1000) / 10) * 10;
-          setTimeout(() => syncStreamlitNumberInput('Robot Lateral Y [mm]', newYmm), 60);
+        if (is3D && lastDraggedRobotPos.y !== null) {{
+          const clampedYmm = Math.max(
+            Math.ceil((minRobotY * 1000) / 10) * 10,
+            Math.min(Math.floor((maxRobotY * 1000) / 10) * 10, Math.round((lastDraggedRobotPos.y * 1000) / 10) * 10)
+          );
+          setTimeout(() => syncStreamlitNumberInput('Robot Lateral Y [mm]', clampedYmm), 60);
         }}
-        lastDraggedPos = null;
+        lastDraggedRobotPos = null;
       }}
     }}
 
