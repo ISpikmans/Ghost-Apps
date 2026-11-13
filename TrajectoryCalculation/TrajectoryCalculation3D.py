@@ -155,21 +155,17 @@ with st.sidebar:
         index=0
     )
 
-    efficiency_loss = st.slider('Efficiency Loss [%]', 0.0, 50.0, 10.0, 0.5)
+    efficiency_loss = st.slider('Efficiency Loss [%]', 0.0, 80.0, 10.0, 0.5)
     pitch_deg = st.slider('Pitch Angle [deg]', 1.0, 90.0, 45.0, 0.5)
-    yaw_deg = st.slider(
-        'Turret Yaw Angle [deg]', -45.0, 45.0, 0.0, 0.5,
-        disabled=not is_3d
-    )
     wheel_Radius_inch = st.slider('Wheel Radius [inch]', 0.5, 6.0, 3.0, 0.1)
 
     st.header("Launch Position")
     robot_x_mm = st.number_input('Robot X [mm]', 0.0, 3600.0, 0.0, 10.0)
     robot_y_mm = st.number_input(
-        'Robot Lateral Y [mm]', -2000.0, 2000.0, 0.0, 10.0,
+        'Robot Y [mm]', -2000.0, 2000.0, 0.0, 10.0,
         disabled=not is_3d
     )
-    height_mm = st.number_input('Launch Height Z [mm]', 0.0, 2000.0, 365.0, 5.0)
+    height_mm = st.number_input('Launch Height Robot Z [mm]', 0.0, 2000.0, 365.0, 5.0)
 
     st.header("Aerodynamics & Spin")
     use_drag = st.checkbox("Enable Air Resistance (Drag)", value=True)
@@ -234,7 +230,6 @@ with st.sidebar:
 # ==========================================
 # 2. UNIFIED 2D / 3D PHYSICS CALCULATIONS
 # ==========================================
-active_yaw_deg = yaw_deg if is_3d else 0.0
 active_robot_y_mm = robot_y_mm if is_3d else 0.0
 active_sidespin_deg = sidespin_deg if is_3d else 0.0
 active_goal_center_y_mm = target_center_y_mm if is_3d else 0.0
@@ -251,6 +246,14 @@ goal_y_center = active_goal_center_y_mm / 1000.0
 goal_half_w = (target_width_mm / 1000.0) / 2.0
 goal_y_min = goal_y_center - goal_half_w
 goal_y_max = goal_y_center + goal_half_w
+goal_x_center = (goal_x1 + goal_x2) / 2.0
+dx_goal = goal_x_center - robot_x_m
+dy_goal = goal_y_center - robot_y_m
+
+if is_3d:
+    active_yaw_deg = math.degrees(math.atan2(dy_goal, dx_goal))
+else:
+    active_yaw_deg = 0.0
 
 wheel_Radius_meter = wheel_Radius_inch * 0.0254
 ball_mass_kg = float(ball_mass_g) / 1000.0
@@ -548,9 +551,16 @@ if is_3d:
         hovertemplate="Launcher: (%{x:.2f}, %{y:.2f}, %{z:.2f} m)<extra></extra>"
     ))
 
-    max_x_range = max(2.0, goal_x2 + 0.5, robot_x_m + 0.5)
-    max_z_range = max(2.0, goal_z2 + 0.5, height_m + 0.5)
-    y_bound = max(1.0, abs(goal_y_center) + goal_half_w + 0.4, abs(robot_y_m) + 0.4)
+    if scoring_trajectories:
+        max_traj_x = max(float(np.max(item[2])) for item in scoring_trajectories)
+        max_traj_y = max(float(np.max(np.abs(item[3]))) for item in scoring_trajectories)
+        max_traj_z = max(float(np.max(item[4])) for item in scoring_trajectories)
+    else:
+        max_traj_x, max_traj_y, max_traj_z = 0.0, 0.0, 0.0
+
+    max_x_range = max(2.0, goal_x2 + 0.5, robot_x_m + 0.5, max_traj_x + 0.3)
+    max_z_range = max(2.0, goal_z2 + 0.5, height_m + 0.5, max_traj_z + 0.3)
+    y_bound = max(1.0, abs(goal_y_center) + goal_half_w + 0.4, abs(robot_y_m) + 0.4, max_traj_y + 0.3)
 
     axis_style = dict(
         backgroundcolor="rgba(0,0,0,0)",
@@ -832,16 +842,17 @@ html_code = f"""
 
 components.html(html_code, height=565, scrolling=False)
 
-# Summary Metrics for Scoring RPMs
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 if scoring_trajectories:
     min_rpm = scoring_trajectories[0][0]
     max_rpm = scoring_trajectories[-1][0]
     mid_rpm, mid_vel = scoring_trajectories[len(scoring_trajectories) // 2][:2]
     col1.metric("Middle Scoring RPM", f"{mid_rpm} RPM ({mid_vel:.2f} m/s)")
     col2.metric("Scoring RPM Range", f"{min_rpm} – {max_rpm} RPM")
-    col3.metric("Valid Steps Found", f"{len(scoring_trajectories)} (Δ25 RPM)")
+    col3.metric("Auto Turret Yaw", f"{active_yaw_deg:.2f}°")
+    col4.metric("Valid Steps Found", f"{len(scoring_trajectories)} (Δ25 RPM)")
 else:
     col1.metric("Middle Scoring RPM", "None found")
     col2.metric("Scoring RPM Range", "—")
-    col3.metric("Valid Steps Found", "0")
+    col3.metric("Auto Turret Yaw", f"{active_yaw_deg:.2f}°")
+    col4.metric("Valid Steps Found", "0")
