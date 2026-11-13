@@ -1,3 +1,4 @@
+import math
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
@@ -53,21 +54,17 @@ st.markdown(
 # ==========================================
 # 1. SIDEBAR CONFIGURATION
 # ==========================================
-# ==========================================
-# 1. SIDEBAR CONFIGURATION
-# ==========================================
 with st.sidebar:
     st.header("Trajectory Settings")
     shooter_type = st.radio(
-    "Shooter Mechanism Type",
-    options=["Single Flywheel", "Dual flywheel"],
-    index=0
+        "Shooter Mechanism Type",
+        options=["Single Flywheel", "Dual flywheel"],
+        index=0
     )
 
     efficiency_loss = st.slider('Efficiency Loss [%]', 0.0, 50.0, 10.0, 0.5)
-    angle = st.slider('Angle [deg]', 1.0, 90.0, 45.0, 0.5) 
-    wheel_Radius_inch = st.slider('Wheel Radius [inch]', 0.5, 6.0, 3.0, 0.1) 
-    velocity_RPM = st.slider('Speed [RPM]', 500, 8000, 3000, 25)
+    angle = st.slider('Angle [deg]', 1.0, 90.0, 45.0, 0.5)
+    wheel_Radius_inch = st.slider('Wheel Radius [inch]', 0.5, 6.0, 3.0, 0.1)
 
     st.header("Launch Position Settings")
     robot_x_mm = st.number_input('Robot Position X [mm]', 0.0, 3600.0, 0.0, 1.0)
@@ -92,7 +89,7 @@ with st.sidebar:
 
     # Determine default values and disabled state based on selected preset
     is_locked = gamepiece != "Custom"
-    
+
     if gamepiece == "Pollen":
         default_diameter = 2.8
         default_mass = 25
@@ -111,7 +108,7 @@ with st.sidebar:
         disabled=is_locked,
         key=f"dia_{gamepiece}"
     )
-    
+
     ball_mass_g = st.slider(
         "Ball Mass [g]",
         min_value=10, max_value=1000,
@@ -135,29 +132,33 @@ target_start_y = target_start_y_mm / 1000.0
 target_end_x = target_end_x_mm / 1000.0
 target_end_y = target_end_y_mm / 1000.0
 
-height_m = height_mm / 1000.0 
+height_m = height_mm / 1000.0
 wheel_Radius_meter = wheel_Radius_inch * 0.0254
-wheel_surface_speed = velocity_RPM * (2 * np.pi / 60) * wheel_Radius_meter
 
 # Conversions for drag & spin physics
-ball_mass_kg = float(ball_mass_g) / 1000.0 
-ball_radius_m = (ball_diameter_inch * 0.0254) / 2.0 
+ball_mass_kg = float(ball_mass_g) / 1000.0
+ball_radius_m = (ball_diameter_inch * 0.0254) / 2.0
 
-# Base speed & Spin RPM determination
-spin_efficiency = 0.70  
-
-if shooter_type == "Single Flywheel":
-    base_velocity_ms = wheel_surface_speed * 0.5
-    raw_spin = velocity_RPM * (wheel_Radius_inch / ball_diameter_inch) * spin_efficiency
-    spin_direction_multiplier = 1.0 if spin_type == "Backspin" else -1.0
-    spin_rpm = raw_spin * spin_direction_multiplier
-else:
-    base_velocity_ms = wheel_surface_speed
-    spin_rpm = 0.0
-
+spin_efficiency = 0.70
 efficiency_multiplier = (100.0 - efficiency_loss) / 100.0
-velocity_ms = base_velocity_ms * efficiency_multiplier
-gravity = 9.81 
+gravity = 9.81
+
+
+def get_launch_params(rpm):
+    wheel_surface_speed = rpm * (2 * math.pi / 60.0) * wheel_Radius_meter
+
+    if shooter_type == "Single Flywheel":
+        base_velocity_ms = wheel_surface_speed * 0.5
+        raw_spin = rpm * (wheel_Radius_inch / ball_diameter_inch) * spin_efficiency
+        spin_direction_multiplier = 1.0 if spin_type == "Backspin" else -1.0
+        spin_rpm = raw_spin * spin_direction_multiplier
+    else:
+        base_velocity_ms = wheel_surface_speed
+        spin_rpm = 0.0
+
+    velocity_ms = base_velocity_ms * efficiency_multiplier
+    return velocity_ms, spin_rpm
+
 
 def check_line_intersection(p1, p2, q1, q2):
     (x1, y1), (x2, y2) = p1, p2
@@ -177,15 +178,18 @@ def check_line_intersection(p1, p2, q1, q2):
 
     return False, None
 
-def compute_trajectory(u, angle_deg, h0, start_x=0.0, g=9.81, drag=True, magnus=True, spin_rpm=0.0):
-    theta = np.radians(angle_deg)
-    vx, vy = u * np.cos(theta), u * np.sin(theta)
 
-    cd, rho = 0.47, 1.225 
-    area = np.pi * (ball_radius_m**2)
+def compute_trajectory(u, angle_deg, h0, start_x=0.0, g=9.81, drag=True, magnus=True, spin_rpm=0.0):
+    theta = math.radians(angle_deg)
+    vx, vy = u * math.cos(theta), u * math.sin(theta)
+
+    cd, rho = 0.47, 1.225
+    area = math.pi * (ball_radius_m ** 2)
     k_drag = (0.5 * rho * cd * area / ball_mass_kg) if drag else 0.0
 
-    omega = spin_rpm * (2 * np.pi / 60.0)
+    omega = spin_rpm * (2 * math.pi / 60.0)
+    spin_sign = 1.0 if omega > 0 else (-1.0 if omega < 0 else 0.0)
+    abs_omega = abs(omega)
 
     dt = 0.002
     x_arr, y_arr = [start_x], [h0]
@@ -194,7 +198,7 @@ def compute_trajectory(u, angle_deg, h0, start_x=0.0, g=9.81, drag=True, magnus=
     goal_p1, goal_p2 = (target_start_x, target_start_y), (target_end_x, target_end_y)
 
     while y >= 0 and len(x_arr) < 3000:
-        v = np.hypot(vx, vy)
+        v = math.hypot(vx, vy)
         if v < 1e-4:
             break
 
@@ -202,12 +206,11 @@ def compute_trajectory(u, angle_deg, h0, start_x=0.0, g=9.81, drag=True, magnus=
         ay_drag = -k_drag * v * vy
 
         ax_mag, ay_mag = 0.0, 0.0
-        if magnus and abs(omega) > 1e-3:
-            spin_ratio = (abs(omega) * ball_radius_m) / v
+        if magnus and abs_omega > 1e-3:
+            spin_ratio = (abs_omega * ball_radius_m) / v
             cl = min(0.5, spin_ratio)
             k_magnus = 0.5 * rho * cl * area / ball_mass_kg
-            spin_sign = np.sign(omega)
-            
+
             ax_mag = -k_magnus * v * vy * spin_sign
             ay_mag = k_magnus * v * vx * spin_sign
 
@@ -231,6 +234,24 @@ def compute_trajectory(u, angle_deg, h0, start_x=0.0, g=9.81, drag=True, magnus=
 
     return np.array(x_arr), np.array(y_arr), hit_target, impact_point
 
+
+# Sweep RPMs from 500 to 8000 in steps of 25; stop after 3 consecutive misses post-hit
+scoring_trajectories = []
+consecutive_misses = 0
+
+for rpm in range(500, 8001, 25):
+    vel_ms, s_rpm = get_launch_params(rpm)
+    x_arr, y_arr, hit_target, impact_point = compute_trajectory(
+        vel_ms, angle, height_m, robot_x_m, gravity, use_drag, use_magnus, s_rpm
+    )
+    if hit_target:
+        scoring_trajectories.append((rpm, vel_ms, x_arr, y_arr, impact_point))
+        consecutive_misses = 0
+    elif scoring_trajectories:
+        consecutive_misses += 1
+        if consecutive_misses >= 3:
+            break
+
 # ==========================================
 # 3. BUILD PLOTLY GRAPH & RENDER UI
 # ==========================================
@@ -238,28 +259,58 @@ st.subheader("Shot Calculator Trajectory")
 
 fig_traj = go.Figure()
 
-active_x, active_y, hit_target, impact_point = compute_trajectory(
-    velocity_ms, angle, height_m, robot_x_m, gravity, use_drag, use_magnus, spin_rpm
-)
+if scoring_trajectories:
+    mid_idx = len(scoring_trajectories) // 2
+    grey_legend_shown = False
 
-if len(active_x) > 0:
-    path_color = '#10B981' if hit_target else '#377DFF'
+    # 1. Draw all non-middle scoring trajectories in thin greyish lines
+    for idx, (rpm, vel_ms, x_arr, y_arr, impact_point) in enumerate(scoring_trajectories):
+        if idx == mid_idx:
+            continue
+
+        fig_traj.add_trace(go.Scatter(
+            x=x_arr,
+            y=y_arr,
+            mode='lines',
+            name='Other Scoring Paths',
+            legendgroup='other_scoring_paths',
+            showlegend=not grey_legend_shown,
+            line=dict(color='rgba(156, 163, 175, 0.35)', width=1.2),
+            hovertemplate=(
+                f"<b>{rpm} RPM</b> ({vel_ms:.2f} m/s)<br>"
+                "Distance: %{x:.2f} m<br>"
+                "Height: %{y:.2f} m<extra></extra>"
+            )
+        ))
+        grey_legend_shown = True
+
+    # 2. Draw the middle scoring trajectory in green on top
+    mid_rpm, mid_vel, mid_x, mid_y, mid_impact = scoring_trajectories[mid_idx]
     fig_traj.add_trace(go.Scatter(
-        x=active_x, y=active_y,
+        x=mid_x,
+        y=mid_y,
         mode='lines',
-        name='Selected Path',
-        line=dict(color=path_color, width=4),
-        hovertemplate="Distance: %{x:.2f} m<br>Height: %{y:.2f} m<extra></extra>"
+        name=f'Middle Scoring Path ({mid_rpm} RPM)',
+        line=dict(color='#10B981', width=3),
+        hovertemplate=(
+            f"<b>Middle: {mid_rpm} RPM</b> ({mid_vel:.2f} m/s)<br>"
+            "Distance: %{x:.2f} m<br>"
+            "Height: %{y:.2f} m<extra></extra>"
+        )
     ))
 
-if hit_target and impact_point:
-    fig_traj.add_trace(go.Scatter(
-        x=[impact_point[0]], y=[impact_point[1]],
-        mode='markers',
-        name='Target Impact',
-        marker=dict(size=14, color='#10B981', symbol='star'),
-        hovertemplate="HIT Point: (%{x:.2f} m, %{y:.2f} m)<extra></extra>"
-    ))
+    # 3. Draw greyish impact dots for the outer scoring shots
+    other_impacts = [item for idx, item in enumerate(scoring_trajectories) if idx != mid_idx]
+    if other_impacts:
+        fig_traj.add_trace(go.Scatter(
+            x=[item[4][0] for item in other_impacts],
+            y=[item[4][1] for item in other_impacts],
+            mode='markers',
+            name='Other Impacts',
+            marker=dict(size=5, color='rgba(156, 163, 175, 0.55)', symbol='circle'),
+            customdata=[item[0] for item in other_impacts],
+            hovertemplate="<b>%{customdata} RPM</b><br>HIT Point: (%{x:.2f} m, %{y:.2f} m)<extra></extra>"
+        ))
 
 # Target Goal Line
 fig_traj.add_trace(go.Scatter(
@@ -274,7 +325,8 @@ fig_traj.add_trace(go.Scatter(
 
 # Launcher Node
 fig_traj.add_trace(go.Scatter(
-    x=[robot_x_m], y=[height_m],
+    x=[robot_x_m],
+    y=[height_m],
     mode='markers',
     name='Launcher',
     marker=dict(size=10, color='#377DFF', symbol='circle-open', line=dict(width=3)),
@@ -336,8 +388,16 @@ st.markdown(
 
 st.plotly_chart(fig_traj, use_container_width=True)
 
-# Render graph inside rounded wrapper
-st.markdown('<div class="rounded-graph-container">', unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
-
-st.metric("Exit Launch Velocity", f"{velocity_ms:.2f} m/s ({velocity_ms * 3.6:.1f} km/h)")
+# Summary Metrics for Scoring RPMs
+col1, col2, col3 = st.columns(3)
+if scoring_trajectories:
+    min_rpm = scoring_trajectories[0][0]
+    max_rpm = scoring_trajectories[-1][0]
+    mid_rpm, mid_vel = scoring_trajectories[len(scoring_trajectories) // 2][:2]
+    col1.metric("Middle Scoring RPM", f"{mid_rpm} RPM ({mid_vel:.2f} m/s)")
+    col2.metric("Scoring RPM Range", f"{min_rpm} – {max_rpm} RPM")
+    col3.metric("Valid Steps Found", f"{len(scoring_trajectories)} (Δ25 RPM)")
+else:
+    col1.metric("Middle Scoring RPM", "None found")
+    col2.metric("Scoring RPM Range", "—")
+    col3.metric("Valid Steps Found", "0")
