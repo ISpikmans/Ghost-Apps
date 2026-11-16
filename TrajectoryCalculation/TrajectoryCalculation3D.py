@@ -548,7 +548,7 @@ def compute_trajectory(u, pitch_deg, yaw_deg, start_pos, g=9.81, drag=True, magn
 
     omega_mag = spin_rpm * (2.0 * math.pi / 60.0)
     abs_omega = abs(omega_mag)
-    spin_sign = 1.0 if omega_mag > 0 else (-1.0 if omega_mag < 0 else 0.0)
+    spin_sign = -1.0 if omega_mag > 0 else (1.0 if omega_mag < 0 else 0.0)
 
     roll = math.radians(roll_deg)
     lx, ly, lz = -math.sin(yaw), math.cos(yaw), 0.0
